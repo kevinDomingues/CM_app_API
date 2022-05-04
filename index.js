@@ -34,6 +34,14 @@ const typologyRoutes = require('./routes/typologyRoutes')
 
 app.use('/typology', typologyRoutes)
 
+const typeRoutes = require('./routes/typeRoutes')
+
+app.use('/type', typeRoutes)
+
+const announcementRoutes = require('./routes/announcementRoutes')
+
+app.use('/announcement', announcementRoutes)
+
 // Entregar uma porta
 const DB_USER = process.env.DB_USER
 const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD)

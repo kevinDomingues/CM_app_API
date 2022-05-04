@@ -14,11 +14,11 @@ router.get('/check/:email', async(req,res) => {
         const user = await User.findOne({email: email})
 
         if(!user){
-            res.status(200).json({valid: true})
+            res.status(200).json({message: 'No user found with the email searched.'})
             return
         }
 
-        res.status(422).json({valid: false})
+        res.status(422).json(user)
 
 
     } catch (error) {
@@ -72,7 +72,6 @@ router.post('/signUp', async(req,res) => {
 
     if(valid){
         try {
-            //criar dados
             await User.create(user)
     
             res.status(201).json({ message:'User created!'})
@@ -81,13 +80,7 @@ router.post('/signUp', async(req,res) => {
             res.status(500).json({error: error})
         }
     }
-
-    
-    
-
 })
-
-// Leitura de dados
 
 router.get('/', async (req,res) => {
     try {
@@ -103,8 +96,6 @@ router.get('/', async (req,res) => {
 
 router.get('/me', auth, async (req,res) => {
 
-    // Extrair dados de requisição pela url = req.params~
-
     const id = req.user_id;
 
     try {
@@ -112,7 +103,7 @@ router.get('/me', auth, async (req,res) => {
         const user = await User.findOne({_id: id})
 
         if(!user){
-            res.status(422).json({message: 'O utilizador não foi encontrado!'})
+            res.status(422).json({message: 'User not found!'})
             return
         }
 
@@ -133,7 +124,7 @@ router.get('/getName', auth, async (req,res) => {
         const user = await User.findOne({_id: id})
 
         if(!user){
-            res.status(422).json({message: 'O utilizador não foi encontrado!'})
+            res.status(422).json({message: 'User not found!'})
             return
         }
 
@@ -146,8 +137,6 @@ router.get('/getName', auth, async (req,res) => {
 })
 
 router.post('/login', async (req,res) => {
-
-    // Extrair dados de requisição pela url = req.params~
 
     try {
         const { email, password } = req.body;
