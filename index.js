@@ -21,7 +21,7 @@ app.get('/', (req,res)=>{
 
     // Mostrar a requisição
 
-    res.json({mensagem: 'Sinal recebido!' })
+    res.json({mensagem: 'Getting signal!' })
 
 })
 
@@ -29,6 +29,10 @@ app.get('/', (req,res)=>{
 const userRoutes = require('./routes/userRoutes')
 
 app.use('/user', userRoutes)
+
+const typologyRoutes = require('./routes/typologyRoutes')
+
+app.use('/typology', typologyRoutes)
 
 // Entregar uma porta
 const DB_USER = process.env.DB_USER
@@ -39,7 +43,7 @@ mongoose
         `mongodb+srv://${DB_USER}:${DB_PASSWORD}@apicluster.kfp5y.mongodb.net/CM?retryWrites=true&w=majority`
         )
     .then( () => {
-        console.log('Conectado ao MongoDB!')
+        console.log('Connected to MongoDB!')
         app.listen(3000)
     })
     .catch( (err) => console.log(err) )
