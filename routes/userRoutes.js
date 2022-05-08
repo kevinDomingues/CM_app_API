@@ -139,13 +139,13 @@ router.get('/getName', auth, async (req,res) => {
 router.post('/login', async (req,res) => {
 
     try {
-        const { email, password } = req.body;
+        const { username, password } = req.body;
 
-        if(!(email, password)) {
+        if(!(username, password)) {
             res.status(400).json({message: 'Insert all inputs!'})
         }
 
-        const user = await User.findOne({email: email})
+        const user = await User.findOne({username: username})
 
         if(!user){
             res.status(422).json({message: 'This user does not exist!'})
@@ -160,7 +160,14 @@ router.post('/login', async (req,res) => {
                       expiresIn: "30d",
                     }
                   );
-                res.status(200).json({token: token})
+                  res.status(200).json({
+                    username: user.username,
+                    name: user.name,
+                    email: user.email,
+                    contact: user.contact,
+                    birthdayDate: user.birthdayDate,
+                    token: token
+                })
             }
             else {
                 res.status(422).json({message: 'Wrong Credentials!'})
