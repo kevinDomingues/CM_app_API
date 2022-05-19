@@ -127,7 +127,6 @@ router.get("/getName", auth, async (req, res) => {
 
 router.post("/login", async (req, res) => {
   // Extrair dados de requisição pela url = req.params~
-  console.log("entrou");
   try {
     const { email, password } = req.body;
 
@@ -146,7 +145,8 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign({ user_id: user._id }, process.env.TOKEN_KEY, {
           expiresIn: "30d",
         });
-        res.status(200).json({ token: token });
+
+        res.status(200).json({ token: token, ...user._doc });
       } else {
         res.status(422).json({ message: "Wrong Credentials!" });
       }
