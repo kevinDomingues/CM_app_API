@@ -9,7 +9,8 @@ const Announcement = new mongoose.Schema({
     price: {type:Number, default:0, required: true},
     location: {type:String, required: true},
     constructionYear: {type:Number, default:0, required: true},
-    hourDate: {type:Date, default: Date.now}
+    hourDate: {type:Date, default: Date.now},
+    images: {type: String}
 })
 
 module.exports = mongoose.model('Announcement', Announcement)

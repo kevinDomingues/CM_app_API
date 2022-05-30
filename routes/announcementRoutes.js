@@ -1,10 +1,33 @@
 const router = require('express').Router()
 
 const { restart } = require('nodemon')
-const Food = require('../models/Announcement')
+const multer = require('multer')
 
 const auth = require("../auth/auth")
 const Announcement = require('../models/Announcement')
+const req = require('express/lib/request')
+const path = require('path')
+
+const storage = multer.diskStorage({
+    destination: 'images',
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + '_' + Date.now() 
+           + path.extname(file.originalname))
+  }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 2048 * 2048 * 6
+    },
+    fileFilter(req, file, cb) {
+        if(!file.originalname.match(/\.(png|jpg)$/)){
+            return cb(new Error('Please upload a Image'))
+        }
+        cb(undefined, true)
+    }
+})
 
 router.get('/getAnnouncements', auth, async (req,res) => {
     const idUser = req.user_id;
@@ -46,11 +69,22 @@ router.get('/getLatest', auth, async (req,res) => {
     }
 })
 
-router.post('/registerAnnouncement', auth, async(req,res) => {
-    const {type, typology, netArea, bathrooms, price, location, constructionYear, hourDate} = req.body
+router.post('/registerAnnouncement', auth, upload.array('images', 10), async(req, res) => {
     const idUser = req.user_id;
+    let images = ''
 
-    const announcement = {
+    if(req.files) {
+        let path = ''
+        req.files.forEach(function(files, index, arr){
+            path = path + files.path + ","
+        })
+        path = path.substring(0, path.lastIndexOf(","))
+        images = path
+    }
+
+    const {type, typology, netArea, bathrooms, price, location, constructionYear, hourDate} = req.body
+
+    let announcement = {
         idUser,
         type,
         typology,
@@ -59,7 +93,8 @@ router.post('/registerAnnouncement', auth, async(req,res) => {
         price, 
         location, 
         constructionYear, 
-        hourDate
+        hourDate,
+        images
     }
 
     if(!announcement){
