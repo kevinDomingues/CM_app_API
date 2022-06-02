@@ -44,6 +44,9 @@ app.use('/announcement', announcementRoutes)
 
 app.use('/images', express.static('images'))
 
+const favoriteRoutes = require('./routes/favoriteRoutes')
+app.use('/favorites', favoriteRoutes)
+
 // Entregar uma porta
 const DB_USER = process.env.DB_USER
 const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD)

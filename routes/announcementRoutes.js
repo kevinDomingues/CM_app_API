@@ -97,6 +97,11 @@ router.post('/registerAnnouncement', auth, upload.array('images', 10), async(req
         images
     }
 
+    if(!idUser){
+        res.status(422).json({error: 'You must provide a valid ID!'})
+        return
+    }
+
     if(!announcement){
         res.status(422).json({error: 'You must provide Announcement!'})
         return
