@@ -5,6 +5,7 @@ const auth = require("../auth/auth")
 const { restart } = require('nodemon')
 const User = require('../models/User')
 const crypto = require('crypto')
+const Announcement = require('../models/Announcement')
 
 router.get('/check/:email', async(req,res) => {
     const email = req.params.email
@@ -21,6 +22,65 @@ router.get('/check/:email', async(req,res) => {
         res.status(422).json(user)
 
 
+    } catch (error) {
+        res.status(500).json({error: error})
+    }
+
+})
+
+router.get('/:id/getAnnouncements', async(req,res) => {
+    
+    const id = req.params.id
+
+    try {
+        
+        const user = await User.findOne({_id: id})
+
+        if(!user){
+            res.status(200).json({message: 'No user found with the id searched.'})
+            return
+        }
+
+        if(user){
+            const announcements = await Announcement.find({idUser: user._id})
+            if (announcements.length==0) {
+                res.status(422).json({message: 'No announcement was found!'})
+                return
+            }
+            res.status(200).json(announcements)
+        }
+
+
+    } catch (error) {
+        res.status(500).json({error: error})
+    }
+
+})
+
+router.get('/deleteAnnouncementAdmin', async(req,res) => {
+    
+    const {id} = req.body
+    const {idAnnouncement} = req.body
+
+    try {
+        
+        const user = await User.findOne({_id: id})
+
+        if(!user){
+            res.status(200).json({message: 'No user found with the id searched.'})
+            return
+        }
+
+        if(user){
+            try {
+                await Announcement.deleteOne({_id: idAnnouncement})
+    
+                res.status(200).json({ message:'Announcement deleted from the user: ' + user.username })
+                
+            } catch (error) {
+                res.status(500).json({message: 'No announcement found for this user.'})
+            }
+        }
     } catch (error) {
         res.status(500).json({error: error})
     }
@@ -277,6 +337,29 @@ router.post('/deleteUser', auth, async (req,res) => {
         }
 
 })
+
+router.post('/deleteUserAdmin', async (req,res) => {
+
+    const {id} = req.body;
+
+    const user = await User.findOne({_id: id})
+
+        if(!user){
+            res.status(422).json({message: 'O utilizador não foi encontrado!'})
+            return
+        }
+
+        try {
+            await User.deleteOne({_id: id})
+
+            res.status(200).json({message:'Utilizador removido com sucesso!'})
+            
+        } catch (error) {
+            res.status(500).json({error: error})
+        }
+
+})
+
 
 
 module.exports = router
