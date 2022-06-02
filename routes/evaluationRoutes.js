@@ -24,14 +24,14 @@ router.get('/check/:id', async(req,res) => {
 })
 
 router.post('/createEvaluation', async(req,res) => {
-    const {ammountOfStars, evaluationText} = req.body
+    const {amountOfStars, evaluationText} = req.body
 
     const evaluation = {
-        ammountOfStars,
+        amountOfStars,
         evaluationText
     }
 
-    if (!ammountOfStars) {
+    if (!amountOfStars) {
         res.status(422).json({error: 'You must provide the evaluation from 1 to 5!'})
     }
 
