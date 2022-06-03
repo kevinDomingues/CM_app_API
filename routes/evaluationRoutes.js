@@ -62,7 +62,7 @@ router.get('/', async (req,res) => {
     }
 })
 
-router.delete('/:id', async (req,res) => {
+router.delete('/delete/:id', async (req,res) => {
 
     const id = req.params.id
 
@@ -82,6 +82,18 @@ router.delete('/:id', async (req,res) => {
             res.status(500).json({error: error})
         }
 
+})
+
+router.delete('/deleteAll', async (req,res) => {
+    try {
+        
+        await Evaluation.deleteMany()
+
+        res.status(200).json({message:'Every evaluation was erased!'})
+        
+    } catch (error) {
+        res.status(500).json({error: error})
+    }
 })
 
 module.exports = router
