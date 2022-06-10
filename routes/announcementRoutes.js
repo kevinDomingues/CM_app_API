@@ -82,18 +82,23 @@ router.post('/registerAnnouncement', auth, upload.array('images', 10), async(req
         images = path
     }
 
-    const {type, typology, netArea, bathrooms, price, location, constructionYear, hourDate} = req.body
+    const {name, type, rooms, netArea, bathrooms, price, location, constructionYear, accessibility, hourDate, email, contact} = req.body
 
     let announcement = {
         idUser,
+        name,
         type,
-        typology,
+        rooms,
         netArea, 
         bathrooms, 
         price, 
         location, 
         constructionYear, 
+        wifi,
+        accessibility,
         hourDate,
+        email,
+        contact,
         images
     }
 
@@ -156,17 +161,23 @@ router.patch('/update/:id', auth, async (req,res) => {
     
     const idAnnouncement = req.params.id
 
-    const {type, typology, netArea, bathrooms, price, location, constructionYear, hourDate} = req.body
+    const {name, type, rooms, netArea, bathrooms, price, location, constructionYear, accessibility, hourDate, email, contact} = req.body
 
-    const announcement = {
+    let announcement = {
+        idUser,
+        name,
         type,
-        typology,
+        rooms,
         netArea, 
         bathrooms, 
         price, 
         location, 
         constructionYear, 
-        hourDate
+        wifi,
+        accessibility,
+        hourDate,
+        email,
+        contact
     }
 
     try {

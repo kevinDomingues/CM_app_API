@@ -6,6 +6,8 @@ const { restart } = require('nodemon')
 const User = require('../models/User')
 const crypto = require('crypto')
 const Announcement = require('../models/Announcement')
+const { Console } = require('console')
+const console = require('console')
 
 router.get('/check/:email', async(req,res) => {
     const email = req.params.email
@@ -149,6 +151,41 @@ router.get('/', async (req,res) => {
 
         res.status(200).json(people)
         
+    } catch (error) {
+        res.status(500).json({error: error})
+    }
+})
+
+router.get('/getUsersAndNAnnouncements', async (req,res) => {
+    try {
+        const people = await User.find()
+        const announcements = await Announcement.find()
+        var usersArray = []
+        people.forEach(async function(user) {
+            try {
+                const userId = user._id.valueOf()
+                var announcementsOfUser = []
+                announcements.forEach(async function(announcement) {
+                    if (announcement.idUser == userId) {
+                        announcementsOfUser.push(announcement)
+                    }
+                });
+                user = {
+                    username: user.username,
+                    name: user.name,
+                    email: user.email,
+                    contact: user.contact,
+                    birthdayDate: user.birthdayDate,
+                    numAnnouncements: announcementsOfUser.length
+                }
+                usersArray.push(user)
+            } catch (error) {
+                res.status(500).json({error: error})
+            }
+            
+        });
+
+        res.status(200).json({usersArray})
     } catch (error) {
         res.status(500).json({error: error})
     }
