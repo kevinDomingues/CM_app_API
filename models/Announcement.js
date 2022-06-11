@@ -9,6 +9,8 @@ const Announcement = new mongoose.Schema({
     bathrooms: {type:Number, default:0, required: true},
     price: {type:Number, default:0, required: true},
     location: {type:String, required: true},
+    lat: {type:Number},
+    lng: {type:Number},
     constructionYear: {type:Number, default:0, required: true},
     wifi: {type:Boolean, default: 0, required: false},
     accessibilty: {type:Boolean, default: 0, required: false},
