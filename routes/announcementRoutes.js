@@ -71,6 +71,25 @@ router.get("/getLatest", auth, async (req, res) => {
   }
 });
 
+router.get("/getMyAnnouncements", auth, async (req, res) => {
+    const idUser = req.user_id;
+  
+    try {
+      const announcement = await Announcement.find({ idUser: idUser })
+        .sort({ dataHora: -1 });
+  
+      if (!announcement) {
+        res.status(422).json({ empty: "Empty list" });
+        return;
+      }
+  
+      res.status(200).json(announcement);
+    } catch (error) {
+      res.status(500).json({ error: error });
+    }
+  });
+
+
 router.post(
   "/registerAnnouncement",
   auth,
@@ -96,6 +115,8 @@ router.post(
       bathrooms,
       price,
       location,
+      lat,
+      lng,
       constructionYear,
       accessibility,
       hourDate,
@@ -113,8 +134,9 @@ router.post(
       bathrooms,
       price,
       location,
+      lat,
+      lng,
       constructionYear,
-      wifi,
       accessibility,
       hourDate,
       email,
@@ -173,6 +195,7 @@ router.patch("/update/:id", auth, async (req, res) => {
   const idAnnouncement = req.params.id;
 
   const {
+    idUser,
     name,
     type,
     rooms,
@@ -180,6 +203,8 @@ router.patch("/update/:id", auth, async (req, res) => {
     bathrooms,
     price,
     location,
+    lat,
+    lng,
     constructionYear,
     accessibility,
     hourDate,
@@ -196,8 +221,9 @@ router.patch("/update/:id", auth, async (req, res) => {
     bathrooms,
     price,
     location,
+    lat,
+    lng,
     constructionYear,
-    wifi,
     accessibility,
     hourDate,
     email,
