@@ -287,16 +287,13 @@ router.post("/loginWeb", async (req, res) => {
 
 //  Atualização de dados (PUT, PATCH(atualização parcial))
 
-router.patch("/update", auth, async (req, res) => {
+router.put("/update", auth, async (req, res) => {
   const id = req.user_id;
 
   const {
+    username,
     name,
     email,
-    minGlicose,
-    maxGlicose,
-    height,
-    weight,
     contact,
     birthdayDate,
   } = req.body;
