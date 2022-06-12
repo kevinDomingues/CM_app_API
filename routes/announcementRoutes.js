@@ -101,6 +101,7 @@ router.post(
       hourDate,
       email,
       contact,
+      wifi,
     } = req.body;
 
     let announcement = {
@@ -220,17 +221,18 @@ router.patch("/update/:id", auth, async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", auth, async (req, res) => {
-  const idAnnouncement = req.params.id;
-
-  const announcement = await Announcement.findOne({ _id: idAnnouncement });
-
-  if (!announcement) {
-    res.status(422).json({ message: "Announcement was not found!" });
-    return;
-  }
-
+router.post("/delete", async (req, res) => {
   try {
+    console.log("body", req.body);
+    const idAnnouncement = req.body.id;
+
+    const announcement = await Announcement.findOne({ _id: idAnnouncement });
+
+    if (!announcement) {
+      res.status(422).json({ message: "Announcement was not found!" });
+      return;
+    }
+
     await Announcement.deleteOne({ _id: idAnnouncement });
 
     res.status(200).json({ message: "Announcement deleted with success!" });
