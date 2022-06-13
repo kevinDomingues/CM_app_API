@@ -149,7 +149,7 @@ router.delete('/delete/:id', auth, async (req,res) => {
             return
         }
         try {
-            await Favorite.deleteOne({_id: idFavorite})
+            await Favorite.deleteOne({_id: favorite._id})
             res.status(200).json({message:'Favorite deleted with success!'})
             
         } catch (error) {
