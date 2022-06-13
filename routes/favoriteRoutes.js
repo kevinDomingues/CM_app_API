@@ -143,13 +143,13 @@ router.patch('/update/:id', auth, async (req,res) => {
 router.delete('/delete/:id', auth, async (req,res) => {
     const id = req.params.id;
     const idUser = req.user_id;
-    const favorite = await Favorite.findOne({idAnnouncement: id, idUser: idUser})
+    const favorite = await Favorite.findOne({_id: id})
         if(!favorite){
             res.status(422).json({message: 'Favorite was not found!'})
             return
         }
         try {
-            await Favorite.deleteOne({_id: favorite._id})
+            await Favorite.deleteOne({_id: id})
             res.status(200).json({message:'Favorite deleted with success!'})
             
         } catch (error) {
