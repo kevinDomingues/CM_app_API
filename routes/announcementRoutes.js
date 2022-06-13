@@ -142,6 +142,7 @@ router.post(
       email,
       contact,
       images,
+      wifi
     };
 
     if (!idUser) {
