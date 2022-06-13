@@ -5,53 +5,19 @@ const Food = require('../models/Favorite')
 
 const auth = require("../auth/auth")
 const Favorite = require('../models/Favorite')
-const Announcement = require('../models/Announcement')
 
 router.get('/getFavorites', auth, async (req,res) => {
     const idUser = req.user_id;
 
     try {
-        var announcementsArray = []
-        const favorites = await Favorite.find({idUser: idUser})
-        const announcements = await Announcement.find();
+        const favorites = await Favorite.find({idUser: idUser}).sort({"dataHora": -1})
 
         if(!favorites){
             res.status(422).json({message: 'No favorite matching the id!'})
             return
         }
 
-        favorites.forEach(async function(favorites) {
-            try {
-                announcements.forEach(async function (announcement) {
-                    if (announcement._id == favorites.idAnnouncement) {
-                        favorites = {
-                            _id: favorites._id,
-                            idAnnouncement: favorites.idAnnouncement,
-                            idUser: favorites.idUser,
-                            name: announcement.name,
-                            type: announcement.type,
-                            rooms: announcement.rooms,
-                            netArea: announcement.netArea,
-                            bathrooms: announcement.bathrooms,
-                            price: announcement.price,
-                            location: announcement.location,
-                            constructionYear: announcement.constructionYear,
-                            wifi: announcement.wifi,
-                            accessibilty: announcement.accessibilty,
-                            hourDate: announcement.hourDate,
-                            email: announcement.email,
-                            contact: announcement.contact
-                        }
-                        announcementsArray.push(favorites);
-                    }
-                  });
-                
-            } catch (error) {
-                res.status(500).json({error: error})
-            }
-        });
-
-        res.status(200).json(announcementsArray)
+        res.status(200).json(favorites)
 
 
     } catch (error) {

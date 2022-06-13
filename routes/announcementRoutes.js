@@ -37,7 +37,9 @@ router.post("/getAnnouncements", async (req, res) => {
   console.log(id);
 
   try {
-    const announcements = await Announcement.find({ idUser: id }).sort({dataHora: -1});
+    const announcements = await Announcement.find({ idUser: id }).sort({
+      dataHora: -1,
+    });
 
     if (!announcements) {
       res.status(422).json({ message: "No announcement matching the id!" });
@@ -105,7 +107,23 @@ router.post(
       images = path;
     }
 
-    const {name, type, rooms, netArea, bathrooms, price, location, constructionYear, wifi, accessibility, hourDate, email, contact} = req.body
+    const {
+      name,
+      type,
+      rooms,
+      netArea,
+      bathrooms,
+      price,
+      location,
+      lat,
+      lng,
+      constructionYear,
+      accessibility,
+      hourDate,
+      email,
+      contact,
+      wifi,
+    } = req.body;
 
     let announcement = {
       idUser,
@@ -123,7 +141,7 @@ router.post(
       hourDate,
       email,
       contact,
-      wifi
+      images,
     };
 
     if (!idUser) {
