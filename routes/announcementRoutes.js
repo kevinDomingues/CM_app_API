@@ -196,7 +196,6 @@ router.patch("/update/:id", auth, async (req, res) => {
   const idAnnouncement = req.params.id;
 
   const {
-    idUser,
     name,
     type,
     rooms,
@@ -214,7 +213,6 @@ router.patch("/update/:id", auth, async (req, res) => {
   } = req.body;
 
   let announcement = {
-    idUser,
     name,
     type,
     rooms,
