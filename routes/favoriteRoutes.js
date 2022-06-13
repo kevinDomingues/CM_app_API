@@ -141,8 +141,9 @@ router.patch('/update/:id', auth, async (req,res) => {
     }
 })
 router.delete('/delete/:id', auth, async (req,res) => {
-    const idFavorite = req.params.id
-    const favorite = await Favorite.findOne({_id: idFavorite})
+    const id = req.params.id;
+    const idUser = req.user_id;
+    const favorite = await Favorite.findOne({idAnnouncement: id, idUser: idUser})
         if(!favorite){
             res.status(422).json({message: 'Favorite was not found!'})
             return
