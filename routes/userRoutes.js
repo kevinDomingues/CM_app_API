@@ -254,13 +254,13 @@ router.post("/loginWeb", async (req, res) => {
   // Extrair dados de requisição pela url = req.params~
 
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!(email, password)) {
+    if (!(username, password)) {
       res.status(400).json({ message: "Insert all inputs!" });
     }
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ username: username });
 
     if (!user) {
       res.status(422).json({ message: "This user does not exist!" });
@@ -275,7 +275,16 @@ router.post("/loginWeb", async (req, res) => {
         const token = jwt.sign({ user_id: user._id }, process.env.TOKEN_KEY, {
           expiresIn: "30d",
         });
-        res.status(200).json({ token: token, permissionLevel: permission });
+        res.status(200).json({
+          _id: user._id,
+          username: user.username,
+          name: user.name,
+          email: user.email,
+          contact: user.contact,
+          birthdayDate: user.birthdayDate,
+          token: token,
+          permissionLevel: permission
+        });;
       } else {
         res.status(422).json({ message: "Wrong Credentials!" });
       }
