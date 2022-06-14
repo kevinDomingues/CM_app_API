@@ -34,6 +34,8 @@ router.get('/getFavorites', auth, async (req,res) => {
                             bathrooms: announcement.bathrooms,
                             price: announcement.price,
                             location: announcement.location,
+                            lat: announcement.lat,
+                            lng: announcement.lng,
                             constructionYear: announcement.constructionYear,
                             wifi: announcement.wifi,
                             accessibilty: announcement.accessibilty,
