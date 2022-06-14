@@ -9,6 +9,7 @@ const Announcement = require("../models/Announcement");
 const { Console } = require("console");
 const console = require("console");
 
+
 router.get("/check/:email", async (req, res) => {
   const email = req.params.email;
 
@@ -175,6 +176,7 @@ router.get("/getUsersAndNAnnouncements", async (req, res) => {
     });
 
     res.status(200).json(usersArray);
+
   } catch (error) {
     res.status(500).json({ error: error });
   }
@@ -320,6 +322,7 @@ router.put("/update", auth, async (req, res) => {
 
     if (updatedUser.matchedCount == 0) {
       res.status(422).json({ message: "O utilizador não foi encontrado!" });
+
       return;
     }
 
@@ -359,7 +362,6 @@ router.post("/deleteUserAdmin", async (req, res) => {
     res.status(422).json({ message: "O utilizador não foi encontrado!" });
     return;
   }
-
   try {
     await User.deleteOne({ _id: id });
 
