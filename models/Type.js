@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 
-const Type = mongoose.model('Type', {
-    idType: {type:String, required: true},
-    typeName: {type:Number, default:0, required: true},
+const Type = new mongoose.Schema({
+    idType: {type:Number, required: true},
+    typeName: {type:String, required: true},
 })
 
 module.exports = mongoose.model('Type', Type)

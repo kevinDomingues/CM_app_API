@@ -5,6 +5,10 @@ const auth = require("../auth/auth");
 const { restart } = require("nodemon");
 const User = require("../models/User");
 const crypto = require("crypto");
+const Announcement = require("../models/Announcement");
+const { Console } = require("console");
+const console = require("console");
+
 
 router.get("/check/:email", async (req, res) => {
   const email = req.params.email;
@@ -13,11 +17,67 @@ router.get("/check/:email", async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (!user) {
-      res.status(200).json({ valid: true });
+      res
+        .status(200)
+        .json({ message: "No user found with the email searched." });
       return;
     }
 
-    res.status(422).json({ valid: false });
+    res.status(422).json(user);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+
+router.get("/:id/getAnnouncements", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      res.status(200).json({ message: "No user found with the id searched." });
+      return;
+    }
+
+    if (user) {
+      const announcements = await Announcement.find({ idUser: user._id });
+      if (announcements.length == 0) {
+        res.status(422).json({ message: "No announcement was found!" });
+        return;
+      }
+      res.status(200).json(announcements);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+
+router.get("/deleteAnnouncementAdmin", async (req, res) => {
+  const { id } = req.body;
+  const { idAnnouncement } = req.body;
+
+  try {
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      res.status(200).json({ message: "No user found with the id searched." });
+      return;
+    }
+
+    if (user) {
+      try {
+        await Announcement.deleteOne({ _id: idAnnouncement });
+
+        res.status(200).json({
+          message: "Announcement deleted from the user: " + user.username,
+        });
+      } catch (error) {
+        res
+          .status(500)
+          .json({ message: "No announcement found for this user." });
+      }
+    }
   } catch (error) {
     res.status(500).json({ error: error });
   }
@@ -67,7 +127,6 @@ router.post("/signUp", async (req, res) => {
 
   if (valid) {
     try {
-      //criar dados
       await User.create(user);
 
       res.status(201).json({ message: "User created!" });
@@ -76,8 +135,6 @@ router.post("/signUp", async (req, res) => {
     }
   }
 });
-
-// Leitura de dados
 
 router.get("/", async (req, res) => {
   try {
@@ -89,16 +146,50 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/me", auth, async (req, res) => {
-  // Extrair dados de requisição pela url = req.params~
+router.get("/getUsersAndNAnnouncements", async (req, res) => {
+  try {
+    const people = await User.find();
+    const announcements = await Announcement.find();
+    var usersArray = [];
+    people.forEach(async function (user) {
+      try {
+        const userId = user._id.valueOf();
+        var announcementsOfUser = [];
+        announcements.forEach(async function (announcement) {
+          if (announcement.idUser == userId) {
+            announcementsOfUser.push(announcement);
+          }
+        });
+        user = {
+          username: user.username,
+          name: user.name,
+          email: user.email,
+          contact: user.contact,
+          birthdayDate: user.birthdayDate,
+          numAnnouncements: announcementsOfUser.length,
+          _id: user._id,
+        };
+        usersArray.push(user);
+      } catch (error) {
+        res.status(500).json({ error: error });
+      }
+    });
 
+    res.status(200).json(usersArray);
+
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+
+router.get("/me", auth, async (req, res) => {
   const id = req.user_id;
 
   try {
     const user = await User.findOne({ _id: id });
 
     if (!user) {
-      res.status(422).json({ message: "O utilizador não foi encontrado!" });
+      res.status(422).json({ message: "User not found!" });
       return;
     }
 
@@ -115,7 +206,7 @@ router.get("/getName", auth, async (req, res) => {
     const user = await User.findOne({ _id: id });
 
     if (!user) {
-      res.status(422).json({ message: "O utilizador não foi encontrado!" });
+      res.status(422).json({ message: "User not found!" });
       return;
     }
 
@@ -126,15 +217,14 @@ router.get("/getName", auth, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  // Extrair dados de requisição pela url = req.params~
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!(email, password)) {
+    if (!(username, password)) {
       res.status(400).json({ message: "Insert all inputs!" });
     }
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ username: username });
 
     if (!user) {
       res.status(422).json({ message: "This user does not exist!" });
@@ -145,8 +235,14 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign({ user_id: user._id }, process.env.TOKEN_KEY, {
           expiresIn: "30d",
         });
-
-        res.status(200).json({ token: token, ...user._doc });
+        res.status(200).json({
+          username: user.username,
+          name: user.name,
+          email: user.email,
+          contact: user.contact,
+          birthdayDate: user.birthdayDate,
+          token: token,
+        });
       } else {
         res.status(422).json({ message: "Wrong Credentials!" });
       }
@@ -160,13 +256,13 @@ router.post("/loginWeb", async (req, res) => {
   // Extrair dados de requisição pela url = req.params~
 
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!(email, password)) {
+    if (!(username, password)) {
       res.status(400).json({ message: "Insert all inputs!" });
     }
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ username: username });
 
     if (!user) {
       res.status(422).json({ message: "This user does not exist!" });
@@ -181,7 +277,16 @@ router.post("/loginWeb", async (req, res) => {
         const token = jwt.sign({ user_id: user._id }, process.env.TOKEN_KEY, {
           expiresIn: "30d",
         });
-        res.status(200).json({ token: token, permissionLevel: permission });
+        res.status(200).json({
+          _id: user._id,
+          username: user.username,
+          name: user.name,
+          email: user.email,
+          contact: user.contact,
+          birthdayDate: user.birthdayDate,
+          token: token,
+          permissionLevel: permission
+        });;
       } else {
         res.status(422).json({ message: "Wrong Credentials!" });
       }
@@ -193,8 +298,16 @@ router.post("/loginWeb", async (req, res) => {
 
 //  Atualização de dados (PUT, PATCH(atualização parcial))
 
-router.patch("/update", auth, async (req, res) => {
-  const { name, email, contact, birthdayDate, token, username } = req.body;
+router.put("/update", auth, async (req, res) => {
+  const id = req.user_id;
+
+  const {
+    username,
+    name,
+    email,
+    contact,
+    birthdayDate,
+  } = req.body;
 
   const user = {
     username,
@@ -205,14 +318,11 @@ router.patch("/update", auth, async (req, res) => {
   };
 
   try {
-    let id = "";
-    jwt.verify(token, process.env.TOKEN_KEY, function (err, decoded) {
-      id = decoded.user_id;
-    });
-
     const updatedUser = await User.updateOne({ _id: id }, user);
+
     if (updatedUser.matchedCount == 0) {
-      res.status(422).json({ message: "This user does not exist!" });
+      res.status(422).json({ message: "O utilizador não foi encontrado!" });
+
       return;
     }
 
@@ -230,10 +340,28 @@ router.post("/deleteUser", auth, async (req, res) => {
   const user = await User.findOne({ _id: id });
 
   if (!user) {
-    res.status(422).json({ message: "This user does not exist!" });
+    res.status(422).json({ message: "O utilizador não foi encontrado!" });
     return;
   }
 
+  try {
+    await User.deleteOne({ _id: id });
+
+    res.status(200).json({ message: "Utilizador removido com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+
+router.post("/deleteUserAdmin", async (req, res) => {
+  const { id } = req.body;
+
+  const user = await User.findOne({ _id: id });
+
+  if (!user) {
+    res.status(422).json({ message: "O utilizador não foi encontrado!" });
+    return;
+  }
   try {
     await User.deleteOne({ _id: id });
 

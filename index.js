@@ -34,6 +34,22 @@ const typologyRoutes = require('./routes/typologyRoutes')
 
 app.use('/typology', typologyRoutes)
 
+const typeRoutes = require('./routes/typeRoutes')
+
+app.use('/type', typeRoutes)
+
+const announcementRoutes = require('./routes/announcementRoutes')
+
+app.use('/announcement', announcementRoutes)
+
+app.use('/images', express.static('images'))
+
+const favoriteRoutes = require('./routes/favoriteRoutes')
+app.use('/favorites', favoriteRoutes)
+
+const evaluationRoutes = require('./routes/evaluationRoutes')
+app.use('/evaluation', evaluationRoutes)
+
 // Entregar uma porta
 const DB_USER = process.env.DB_USER
 const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD)
@@ -44,7 +60,7 @@ mongoose
         )
     .then( () => {
         console.log('Connected to MongoDB!')
-        app.listen(3000)
+        app.listen(4000)
     })
     .catch( (err) => console.log(err) )
 
